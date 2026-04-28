@@ -1,9 +1,19 @@
 <?php
 
 // Autoload simples para não precisarmos usar 'require' em todos os arquivos
+// Autoload atualizado para lidar com a case-sensitivity do Linux
 spl_autoload_register(function ($class) {
-    // Converte os namespaces para caminhos de diretório no Linux (barras invertidas para barras normais)
-    $path = __DIR__ . '/' . str_replace('\\', '/', $class) . '.php';
+    // Separa o Namespace (ex: Controllers) do nome da Classe (ex: PedidoController)
+    $partes = explode('\\', $class);
+    
+    // A última parte é o nome do arquivo, que mantém as maiúsculas (PedidoController.php)
+    $nomeArquivo = array_pop($partes);
+    
+    // O que sobrou são as pastas, e forçamos elas para minúsculo (controllers)
+    $pastas = strtolower(implode('/', $partes));
+    
+    $path = __DIR__ . '/' . $pastas . '/' . $nomeArquivo . '.php';
+    
     if (file_exists($path)) {
         require_once $path;
     }
